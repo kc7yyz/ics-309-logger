@@ -9,9 +9,30 @@ amateur radio Directed Net. That information can then be used to generate a form
 - For speed of entry, utilizes the [fzf](https://github.com/junegunn/fzf) command-line fuzzy finder tool to radiply search for callsigns and names.
 - Outputs information in multiple formats (e.g., log, tsv) to be imported and used to generate a more formal ICS 309 Communication log.
 
+## Requirements
+- Runs on Linux/Unix platforms.
+- Runs on macOS with slight modifications.
+- Bash 4+ is required as associative arrays are used in this script.
+- The [fzf](https://github.com/junegunn/fzf) command-line fuzzy finder is a required dependency.
+
 ## Installation
 - Download to any directory.
 - Edit the *stations.txt* file (or create a separate file) with frequently used stations that fzf can search through when asking for FROM and TO stations.
+
+### Installing on macOS
+- The bash version for macOS stopped advancing at 3.2. As a result, a Terminal session
+will not be able to run this script. To get around this, you can use Homebrew to install
+a 4+ version of bash, change the shebang on the script, then run in a separate bash session. 
+For example:
+
+```
+bash-3.2$ brew install bash
+bash-3.2$ sudo bash -c "echo $(brew --prefix)/bin/bash >> /private/etc/shells"
+bash-3.2$ brew install fzf
+bash-3.2$ vi ./generate-ics-309.sh ///changed first line to #!/usr/local/bin/bash
+bash-3.2$ /usr/local/bin/bash
+bash-5.1$ ./generate-ics-309.sh  
+```
 
 ## Running
 The *generate-ics-309.sh* script can be executed simply by invoking it on the command line.
@@ -63,10 +84,6 @@ Winlink ICS-309 template.
 16:57	ABC123 Some Operator	Announcement	Thanks everyone!
 ``` 
 
-## Requirements
-- Runs on Linux/Unix platforms.
-- Bash 4+ is required as associative arrays are used in this script.
-- The [fzf](https://github.com/junegunn/fzf) command-line fuzzy finder is a required dependency.
-
 ## License
-[MIT](https://opensource.org/licenses/MIT)
+[MIT](./LICENSE)
+

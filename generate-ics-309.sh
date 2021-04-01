@@ -26,7 +26,8 @@ stationsFile="stations.txt"
 while getopts "dn:f:" options; do        
   case "${options}" in                 
     d)                                  
-      ./clear-logs.sh
+      rm -f *.log
+      rm -f *.tsv
       ;;
     n)                                  
       netName="${OPTARG}"                 
@@ -83,19 +84,26 @@ recordQso() {
   qsoToKeyList+=("$qsoToKey")
   qsoTimeList+=("$qsoTime")
   qsoMessageList+=("$qsoMessage")
-  printf "%s From: %s, To: %s, Message: %s\n" "$qsoTime" "$qsoFromKey" "$qsoToKey" "$qsoMessage" # | tee -a $log
+
+  qsoFromStation="${callsigns["$qsoFromKey"]}"
+  # todo decode the following stations in the printf below
+  #callsigns["o"]="$operator"
+  #callsigns["m"]="$myCallAndName"
+  #callsigns["a"]=""
+  #callsigns["u"]="Unknown"
+  qsoToStation="${callsigns["$qsoToKey"]}"
+
+  printf "%s From: %s, To: %s, Message: %s\n" "$qsoTime" "$qsoFromStation" "$qsoToStation" "$qsoMessage" # | tee -a $log
 }
 
 # record net end time and complete output files
 endNet() {
 
   # append static callsigns for convenience
-  callsigns["key"]="value"
   callsigns["o"]="$operator"
   callsigns["m"]="$myCallAndName"
-  callsigns["a"]="Announcement"
+  callsigns["a"]=""
   callsigns["u"]="Unknown"
-  addCallsign "foobar"
 
   # end the net
   netEnd=$(getCurrTime)
