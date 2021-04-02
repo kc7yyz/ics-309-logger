@@ -151,8 +151,8 @@ selectStation() {
   while [[ -z "${stationKey}" ]]; do
     # display known stations
     echo "Select an option for $1 station:"
-    for k in "${!callsigns[@]}"; do
-      echo "$k) ${callsigns[$k]}"
+    for (( i=1; i<=${#callsigns[@]}; i++ )); do 
+      echo "$i) ${callsigns[$i]}"
     done
 
     if [ "$1" == "TO" ]; then
