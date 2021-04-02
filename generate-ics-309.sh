@@ -170,7 +170,7 @@ selectStation() {
 
     if [ "$1" == "TO" ] && [ "$choice" == "a" ]; then
       stationKey="a"
-      station="Announcement"
+      station="All/Announcement"
     elif [ "$choice" == "x" ]; then
       endNet
     elif [ "$choice" == "m" ]; then
@@ -244,13 +244,13 @@ if [[ "$netStart" == "" ]]; then
   netStart="$(getCurrTime)"
 fi
 
-# capture the operator
-findSingleStation "OPERATOR"
-echo "Net Operator: $operator"
-
 # capture the prepared by
 findSingleStation "YOUR"
 echo "Prepared By: $myCallAndName"
+
+# capture the operator
+findSingleStation "OPERATOR"
+echo "Net Operator: $operator"
 
 echo
 echo "*** Starting QSO log"
