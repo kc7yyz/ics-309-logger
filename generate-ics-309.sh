@@ -148,7 +148,7 @@ selectStation() {
       echo "a) All/Announcement"
     fi
 
-    printf "%-50s %s\n" "m) Me ($myCallAndName)" ""; #"c) Checkin only"
+    printf "%-50s %s\n" "m) Me ($myCallAndName)" "c) Checkin station"
     printf "%-50s %s\n" "n) New callsign"         "e) Edit callsign"
     printf "%-50s %s\n" "o) Operator ($operator)" ""; # "r) Reply (swap last from/to)"
     printf "%-50s %s\n" "u) Unknown callsign"     "x) Exit (end net)"
@@ -182,6 +182,11 @@ selectStation() {
       if [ ! "$station" == "" ]; then
         addCallsign "$station"
         stationKey="${numSelectedCallsigns}";
+      fi
+    elif [ "$choice" == "c" ]; then
+      station=$(fzf --header "Select or type in CHECKIN Station (ESC to exit)" --print-query <$stationsFile | tail -1)
+      if [ ! "$station" == "" ]; then
+        addCallsign "$station"
       fi
     elif [ $choice -gt 0 ] 2>/dev/null && [ $choice -le ${numSelectedCallsigns} ] 2>/dev/null; then
       stationKey="$choice"
