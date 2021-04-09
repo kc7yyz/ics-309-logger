@@ -187,6 +187,11 @@ selectStation() {
       station=$(fzf --header "Select or type in CHECKIN Station (ESC to exit)" --print-query <$stationsFile | tail -1)
       if [ ! "$station" == "" ]; then
         addCallsign "$station"
+        qsoFromKey="${numSelectedCallsigns}";
+        qsoToKey="o"
+        qsoTime=$(getCurrTime s)
+        qsoMessage="Checkin"
+        recordQso
       fi
     elif [ $choice -gt 0 ] 2>/dev/null && [ $choice -le ${numSelectedCallsigns} ] 2>/dev/null; then
       stationKey="$choice"
