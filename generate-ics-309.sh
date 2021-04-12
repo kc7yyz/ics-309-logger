@@ -3,8 +3,9 @@
 function usage {
     echo "usage: $0 [-d] [-n netname] [-f station file]"
     echo "  -d              Delete any existing log files"
-    echo "  -n netname      The name of the net"
     echo "  -f stationfile  The name of the station file"
+    echo "  -n netname      The name of the net"
+    echo "  -w number       Number of words to print in output (separated by spaces, starting from left)"
     exit 1
 }
 
@@ -22,8 +23,9 @@ fi
 
 netName=""
 stationsFile="stations.txt"
+wordsToPrint=2
 
-while getopts "dn:f:" options; do        
+while getopts "dn:f:w:" options; do        
   case "${options}" in                 
     d)                                  
       rm -f *.log
@@ -31,6 +33,9 @@ while getopts "dn:f:" options; do
       ;;
     n)                                  
       netName="${OPTARG}"                 
+      ;;
+    w)                                  
+      wordsToPrint="${OPTARG}"                 
       ;;
     f) 
       stationsFile="${OPTARG}"
@@ -107,8 +112,16 @@ endNet() {
 
   for (( i=0; i<${#qsoFromKeyList[@]}; i++ ));
   do
-    qsoFromStation="${callsigns["${qsoFromKeyList[$i]}"]}"
-    qsoToStation="${callsigns["${qsoToKeyList[$i]}"]}"
+    station="${callsigns["${qsoFromKeyList[$i]}"]}"
+    callsign="`echo "${station}" | cut -d" " -f1`"
+    fullname="`echo "${station}" | cut -d" " -f2-${wordsToPrint}`"
+    qsoFromStation="${callsign^^} ${fullname^}"
+
+    station="${callsigns["${qsoToKeyList[$i]}"]}"
+    callsign="`echo "${station}" | cut -d" " -f1`"
+    fullname="`echo "${station}" | cut -d" " -f2-${wordsToPrint}`"
+    qsoToStation="${callsign^^} ${fullname^}"
+
     qsoTime="${qsoTimeList[$i]}"
     qsoMessage="${qsoMessageList[$i]}"
     printf "%s From: %s, To: %s, Message: %s\n" "$qsoTime" "$qsoFromStation" "$qsoToStation" "$qsoMessage" | tee -a $log
