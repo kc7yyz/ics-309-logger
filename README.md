@@ -33,7 +33,6 @@ bash-3.2$ vi ./generate-ics-309.sh ///changed first line to #!/usr/local/bin/bas
 bash-3.2$ /usr/local/bin/bash
 bash-5.1$ ./generate-ics-309.sh  
 ```
-
 ## Running
 The *generate-ics-309.sh* script can be executed simply by invoking it on the command line.
 
@@ -54,6 +53,46 @@ Example with optional command-line arguments:
 $ ./generate-ics-309.sh -n 'Emergency Practice Net' -f custom-stations.txt
 ``` 
 
+### Running on macOS
+You can also create a small script (e.g., _run-on-mac.sh_) to create a modified runnable like so:
+```
+bash-3.2$ cat run-on-mac.sh
+echo "#!/usr/local/bin/bash" > tmp.sh
+tail -n +2 generate-ics-309.sh >> tmp.sh
+chmod +x tmp.sh
+/usr/local/bin/bash tmp.sh
+bash-3.2$ ./run-on-mac.sh
+```
+## Using the Script
+
+1. Enter the Incident name
+```
+Incident Name []: Emergency Practice Net
+```
+1. Enter the Operational Period (Defaults to current date and time). Press Enter to accept default.
+```
+Operational Period (Date/Time) From [2021-04-02 21:02]:
+``` 
+1. Enter YOUR callsign. This is the first time fzf will pull up choices from the stations file.
+
+<img src="images/selectYourStation.png" width="200">
+
+![foobar](./images/selectYourStation.png)
+```
+Incident Name []: Emergency Practice Net
+Operational Period (Date/Time) From [2021-04-02 21:02]: 
+Prepared By: KC7YYZ Carl Erickson
+Net Operator: 007007 James Bond
+
+*** Starting QSO log
+
+Select an option for FROM station:
+m) Me (KC7YYZ Carl Erickson)                       
+n) New callsign                                    e) Edit callsign
+o) Operator (007007 James Bond)                    
+u) Unknown callsign                                x) Exit (end net)
+Select FROM option: 
+```
 ## Output
 
 ### Log file

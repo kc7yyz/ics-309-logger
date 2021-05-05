@@ -161,10 +161,11 @@ selectStation() {
       echo "a) All/Announcement"
     fi
 
-    printf "%-50s %s\n" "m) Me ($myCallAndName)" "c) Checkin station"
+    printf "%-50s %s\n" "m) Me ($myCallAndName)"  "c) Checkin only"
     printf "%-50s %s\n" "n) New callsign"         "e) Edit callsign"
-    printf "%-50s %s\n" "o) Operator ($operator)" ""; # "r) Reply (swap last from/to)"
-    printf "%-50s %s\n" "u) Unknown callsign"     "x) Exit (end net)"
+    printf "%-50s %s\n" "o) Operator ($operator)" "r) Reply (swap last from/to)"
+    printf "%-50s %s\n" "u) Unknown callsign"     "rc) Rollcall"
+    printf "%-50s %s\n" "h) Help"                 "x) Exit (end net)"
 
     read -e -p "Select $1 option: " choice
 
@@ -173,6 +174,12 @@ selectStation() {
       station="All/Announcement"
     elif [ "$choice" == "x" ]; then
       endNet
+    elif [ "$choice" == "rc" ]; then
+      echo "Roll call: Todo"
+    elif [ "$choice" == "h" ]; then
+      echo "Help: Todo"
+    elif [ "$choice" == "r" ]; then
+      echo "Reply: Todo"
     elif [ "$choice" == "m" ]; then
       stationKey="m"
       station="$myCallAndName"
