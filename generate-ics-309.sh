@@ -28,8 +28,7 @@ wordsToPrint=2
 while getopts "dn:f:w:" options; do        
   case "${options}" in                 
     d)                                  
-      rm -f *.log
-      rm -f *.tsv
+      rm -f ics-309.*
       ;;
     n)                                  
       netName="${OPTARG}"                 
@@ -68,9 +67,9 @@ declare qsoTime
 
 # define log files
 timestamp=$(date +"%Y-%m-%d_%H%M%S")
-tsv="ics-309.$timestamp.tsv"
+txt="ics-309.$timestamp.txt"
 log="ics-309.$timestamp.log"
-touch $tsv
+touch $txt
 touch $log
 
 # fetch current time in "HH:MM" (s) or "YYYY-MM-DD HH:MM" (default) format
@@ -125,7 +124,7 @@ endNet() {
     qsoTime="${qsoTimeList[$i]}"
     qsoMessage="${qsoMessageList[$i]}"
     printf "%s From: %s, To: %s, Message: %s\n" "$qsoTime" "$qsoFromStation" "$qsoToStation" "$qsoMessage" | tee -a $log
-    printf "%s\t%s\t%s\t%s\n" "$qsoTime" "$qsoFromStation" "$qsoToStation" "$qsoMessage" >>$tsv
+    printf "%s\t%s\t%s\t%s\n" "$qsoTime" "$qsoFromStation" "$qsoToStation" "$qsoMessage" >>$txt
   done
 
   printf "Prepared By: $myCallAndName\n" | tee -a $log
@@ -291,7 +290,7 @@ while :; do
   echo;
 
   # record time
-  qsoTime=$(getCurrTime s)
+  qsoTime=$(getCurrTime)
 
   # get the TO stationKey
   selectStation "TO";
