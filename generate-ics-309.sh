@@ -93,6 +93,9 @@ recordQso() {
   qsoToStation="${callsigns["$qsoToKey"]}"
 
   printf "%s From: %s, To: %s, Message: %s\n" "$qsoTime" "$qsoFromStation" "$qsoToStation" "$qsoMessage" # | tee -a $log
+
+  printf "\n***\n*** Ready for next contact\n***\n\n"
+
 }
 
 # record net end time and complete output files
@@ -155,6 +158,7 @@ selectStation() {
     for (( i=1; i<=${numSelectedCallsigns}; i++ )); do
       echo "$i) ${callsigns[$i]}"
     done
+    echo
 
     if [ "$1" == "TO" ]; then
       echo "a) All/Announcement"
@@ -162,32 +166,96 @@ selectStation() {
 
     printf "%-50s %s\n" "m) Me ($myCallAndName)"  "c) Checkin only"
     printf "%-50s %s\n" "n) New callsign"         "e) Edit callsign"
-    printf "%-50s %s\n" "o) Operator ($operator)" "r) Reply (swap last from/to)"
+    printf "%-50s %s\n" "o) Operator ($operator)" "r) Reply (Swap last from/to stations)"
     printf "%-50s %s\n" "u) Unknown callsign"     "rc) Rollcall"
     printf "%-50s %s\n" "h) Help"                 "x) Exit (end net)"
-
+    echo
+    
     read -e -p "Select $1 option: " choice
 
+    # ANNOUNCEMENT
     if [ "$1" == "TO" ] && [ "$choice" == "a" ]; then
       stationKey="a"
       station="All/Announcement"
+
+    # EXIT
     elif [ "$choice" == "x" ]; then
       endNet
-    elif [ "$choice" == "rc" ]; then
-      echo "Roll call: Todo"
+
+    # HELP
     elif [ "$choice" == "h" ]; then
+      # todo
       echo "Help: Todo"
+
+    # ROLLCALL
+    elif [ "$choice" == "rc" ]; then
+
+      qsoFromKey="o"
+      echo "Selected FROM station: ${callsigns["$qsoFromKey"]}";
+
+      selectableCallsignKeys=""
+      for (( k=1; k<=$numSelectedCallsigns; k++ )); do
+        if [ $k -gt 1 ]; then
+          selectableCallsignKeys+=", "
+        fi
+        selectableCallsignKeys+="$k"
+      done
+      selectableCallsignKeys+=", or 'c' to cancel"
+
+      # validate number
+      key=0
+      firstLoop=true
+      valid=false
+      while $firstLoop || ! $valid; do
+        firstLoop=false
+        read -e -p "Select TO callsign ($selectableCallsignKeys): " key
+        if [ $key -gt 0 ] 2>/dev/null && [ $key -le ${numSelectedCallsigns} ] 2>/dev/null; then
+          valid=true
+        elif [ "$key" == "c" ]; then
+          valid=true
+        else
+          echo "Please try again"
+        fi
+      done
+
+      if [ "$key" != "c" ]; then
+        qsoToKey=$key
+        station=${callsigns["$qsoToKey"]}
+        echo "Selected TO station: $station";
+        read -e -p "Enter message: " qsoMessage
+
+        qsoMessage="Rollcall to $station. Reply: $qsoMessage"
+        recordQso
+      fi
+
+    # REPLY
     elif [ "$choice" == "r" ]; then
-      echo "Reply: Todo"
+
+      tmp=$qsoFromKey
+      qsoFromKey=$qsoToKey
+      qsoToKey=$tmp
+
+      echo "Selected FROM station: ${callsigns["$qsoFromKey"]}";
+      echo "Selected TO station: ${callsigns["$qsoToKey"]}";
+      read -e -p "Enter message: " qsoMessage
+      recordQso
+
+    # MYCALL
     elif [ "$choice" == "m" ]; then
       stationKey="m"
       station="$myCallAndName"
+
+    # OPERATOR
     elif [ "$choice" == "o" ]; then
       stationKey="o"
       station="$operator"
+
+    # UNKNOWN
     elif [ "$choice" == "u" ]; then
       stationKey="u"
       station="Unknown"
+
+    # EDIT STATIONS
     elif [ "$choice" == "e" ]; then
       editableCallsignKeys="m, o"
       for (( k=1; k<=$numSelectedCallsigns; k++ )); do
@@ -196,12 +264,16 @@ selectStation() {
       read -e -p "Select callsign to edit ($editableCallsignKeys): " key
       read -e -p "Enter new value: " newCall
       editCallsign "$key" "$newCall"
+
+    # NEW STATION
     elif [ "$choice" == "n" ]; then
       station=$(fzf --header "Select or type in $1 Station (ESC to exit)" --print-query <$stationsFile | tail -1)
       if [ ! "$station" == "" ]; then
         addCallsign "$station"
         stationKey="${numSelectedCallsigns}";
       fi
+
+    # CHECKIN ONLY
     elif [ "$choice" == "c" ]; then
       station=$(fzf --header "Select or type in CHECKIN Station (ESC to exit)" --print-query <$stationsFile | tail -1)
       if [ ! "$station" == "" ]; then
@@ -212,9 +284,13 @@ selectStation() {
         qsoMessage="Checkin"
         recordQso
       fi
+
+    # SELECT STATION BY NUMBER
     elif [ $choice -gt 0 ] 2>/dev/null && [ $choice -le ${numSelectedCallsigns} ] 2>/dev/null; then
       stationKey="$choice"
       station="${callsigns[$stationKey]}"
+
+    # WHOOPS
     else
       echo
       echo "** Invalid option. Please try again."
@@ -233,6 +309,12 @@ selectStation() {
 }
 
 addCallsign() {
+  for (( i=1; i<=${numSelectedCallsigns}; i++ )); do
+    if [ "${callsigns[$i]}" == "$1" ]; then
+      return
+    fi
+  done
+
   numSelectedCallsigns=$((numSelectedCallsigns+1))
   callsigns["$numSelectedCallsigns"]="$1"
 }
@@ -277,6 +359,7 @@ callsigns["a"]=""
 callsigns["u"]="Unknown"
 
 numSelectedCallsigns=0
+addCallsign "$myCallAndName"
 
 echo
 echo "*** Starting QSO log"
@@ -303,8 +386,5 @@ while :; do
   # Record QSO
   recordQso
 
-  echo
-  echo "*** Ready for next contact"
-  echo
 done
 
